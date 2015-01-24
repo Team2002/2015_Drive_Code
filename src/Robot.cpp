@@ -2,47 +2,45 @@
 
 class Robot: public IterativeRobot{
 public:
-	Talon motor;
-	DigitalInput button;
-	Encoder encoder;
+	Joystick Joystick1;
+	Talon Talon1;
+	Talon Talon2;
+	Solenoid SingleSolenoid1;
+	DoubleSolenoid DoubleSolenoid1;
 
 	Robot():
-		motor(0),
-		button(0),
-		encoder(1, 2, false, Encoder::k4X)
-		{
-			encoder.SetSamplesToAverage(5);
-			encoder.SetDistancePerPulse(1.0 / 360.0 * 2.0 * 3.1415 * 1.5);
-			encoder.SetMinRate(1.0);
-		}
-	
-	void RobotInit(){
+		Joystick1(0),
+		Talon1(4),
+		Talon2(6),
+		SingleSolenoid1(2),
+		DoubleSolenoid1(0,1)
+		{}
 
-	}
+	void RobotInit(){}
 
-	void AutonomousInit(){
+	void AutonomousInit(){}
 
-	}
+	void AutonomousPeriodic(){}
 
-	void AutonomousPeriodic(){
-
-	}
-
-	void TeleopInit(){
-
-	}
+	void TeleopInit(){}
 
 	void TeleopPeriodic(){
-		if(button.Get() == true){
-			motor.Set(0.5);
-		}else{
-			motor.Set(0);
-		}
+		// Cache Joystick Values
+		int Y = Joystick1.GetY(),
+		Z = Joystick1.GetZ();
+		float Slider = (Joystick1.GetThrottle()/2)+1;
 
-		SmartDashboard::PutBoolean("Button Pushed", button.Get());
-		SmartDashboard::PutBoolean("Encoder Stopped", encoder.GetStopped());
-		SmartDashboard::PutNumber("Encoder Rate", encoder.GetRate());
-		SmartDashboard::PutNumber("Encoder Distance", encoder.GetDistance());
+		// Motor Control
+		Talon1.Set(-Slider * (Y - Z));
+		Talon2.Set(Slider * (Y + Z));
+
+		// Single Solenoid
+		SingleSolenoid1.Set(Joystick1.GetRawButton(7));
+
+		// Double Solenoid
+		if(Joystick1.GetRawButton(9)) DoubleSolenoid1.Set(DoubleSolenoid::kForward);
+		else if (Joystick1.GetRawButton(10)) DoubleSolenoid1.Set(DoubleSolenoid::kReverse);
+		else DoubleSolenoid1.Set(DoubleSolenoid::kOff);
 	}
 };
 
