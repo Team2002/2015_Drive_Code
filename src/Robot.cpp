@@ -5,14 +5,12 @@ public:
 	Joystick Joystick1;
 	Talon Talon1;
 	Talon Talon2;
-	Solenoid SingleSolenoid1;
 	DoubleSolenoid DoubleSolenoid1;
 
 	Robot():
 		Joystick1(0),
 		Talon1(4),
 		Talon2(6),
-		SingleSolenoid1(2),
 		DoubleSolenoid1(0,1)
 		{}
 
@@ -26,21 +24,27 @@ public:
 
 	void TeleopPeriodic(){
 		// Cache Joystick Values
-		int Y = Joystick1.GetY(),
-		Z = Joystick1.GetZ();
-		float Slider = (Joystick1.GetThrottle()/2)+1;
+		double Y = Joystick1.GetY(),
+		Z = Joystick1.GetZ(),
+		Slider = Joystick1.GetThrottle();
+		bool JoyBtn9 = Joystick1.GetRawButton(9),
+		JoyBtn10 = Joystick1.GetRawButton(10);
 
-		// Motor Control
-		Talon1.Set(-Slider * (Y - Z));
-		Talon2.Set(Slider * (Y + Z));
+		// Drive
+		Talon1.Set(-((Slider+1)/2) * (Y - Z));
+		Talon2.Set(((Slider+1)/2) * (Y + Z));
 
-		// Single Solenoid
-		SingleSolenoid1.Set(Joystick1.GetRawButton(7));
-
-		// Double Solenoid
-		if(Joystick1.GetRawButton(9)) DoubleSolenoid1.Set(DoubleSolenoid::kForward);
-		else if (Joystick1.GetRawButton(10)) DoubleSolenoid1.Set(DoubleSolenoid::kReverse);
+		// Double Solenoid Control
+		if (JoyBtn9) DoubleSolenoid1.Set(DoubleSolenoid::kForward);
+		else if (JoyBtn10) DoubleSolenoid1.Set(DoubleSolenoid::kReverse);
 		else DoubleSolenoid1.Set(DoubleSolenoid::kOff);
+
+		// Smart Dashboard
+		SmartDashboard::PutNumber("Y", Y);
+		SmartDashboard::PutNumber("Z", Z);
+		SmartDashboard::PutNumber("Slider", Slider);
+		SmartDashboard::PutNumber("Talon1 Speed", -((Slider+1)/2) * (Y - Z));
+		SmartDashboard::PutNumber("Talon1 Speed", ((Slider+1)/2) * (Y + Z));
 	}
 };
 
