@@ -1,17 +1,19 @@
 #include "WPILib.h"
+#include "RobotMap.h"
 
 class Robot: public IterativeRobot{
 public:
-	Joystick Joystick1;
-	Talon Talon1;
-	Talon Talon2;
-	DoubleSolenoid DoubleSolenoid1;
+	Joystick Joystick_1;
+	Talon Left_Talon_1, Left_Talon_2, Left_Talon_3, Right_Talon_1, Right_Talon_2, Right_Talon_3;
 
 	Robot():
-		Joystick1(0),
-		Talon1(4),
-		Talon2(6),
-		DoubleSolenoid1(0,1)
+		Joystick_1(PORT_JOYSTICK),
+		Left_Talon_1(PORT_LEFT_TALON_1),
+		Left_Talon_2(PORT_LEFT_TALON_2),
+		Left_Talon_3(PORT_LEFT_TALON_3),
+		Right_Talon_1(PORT_RIGHT_TALON_1),
+		Right_Talon_2(PORT_RIGHT_TALON_2),
+		Right_Talon_3(PORT_RIGHT_TALON_3)
 		{}
 
 	void RobotInit(){}
@@ -23,28 +25,24 @@ public:
 	void TeleopInit(){}
 
 	void TeleopPeriodic(){
-		// Cache Joystick Values
-		double Y = Joystick1.GetY(),
-		Z = Joystick1.GetZ(),
-		Slider = Joystick1.GetThrottle();
-		bool JoyBtn9 = Joystick1.GetRawButton(9),
-		JoyBtn10 = Joystick1.GetRawButton(10);
+		// Cache joystick values
+		float y = Joystick_1.GetY(),
+		z = Joystick_1.GetZ();
+
+		// Speed multiplier (0-1) (To-do: use the joystick's slider to set this)
+		float multiplier = 1.0;
+
+		// Calculate motor speeds
+		float left = -multiplier * (y - z),
+		right = multiplier * (y - z);
 
 		// Drive
-		Talon1.Set(-((Slider+1)/2) * (Y - Z));
-		Talon2.Set(((Slider+1)/2) * (Y + Z));
-
-		// Double Solenoid Control
-		if (JoyBtn9) DoubleSolenoid1.Set(DoubleSolenoid::kForward);
-		else if (JoyBtn10) DoubleSolenoid1.Set(DoubleSolenoid::kReverse);
-		else DoubleSolenoid1.Set(DoubleSolenoid::kOff);
-
-		// Smart Dashboard
-		SmartDashboard::PutNumber("Y", Y);
-		SmartDashboard::PutNumber("Z", Z);
-		SmartDashboard::PutNumber("Slider", Slider);
-		SmartDashboard::PutNumber("Talon1 Speed", -((Slider+1)/2) * (Y - Z));
-		SmartDashboard::PutNumber("Talon1 Speed", ((Slider+1)/2) * (Y + Z));
+		Left_Talon_1.Set(left);
+		Left_Talon_2.Set(left);
+		Left_Talon_3.Set(left);
+		Right_Talon_1.Set(right);
+		Right_Talon_2.Set(right);
+		Right_Talon_3.Set(right);
 	}
 };
 
