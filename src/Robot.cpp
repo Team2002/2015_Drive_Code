@@ -1,109 +1,101 @@
 #include "WPILib.h"
 #include "RobotMap.h"
 
-class Robot: public IterativeRobot{
+class Robot: public SampleRobot{
 public:
-	Joystick Joystick_1;
-	Talon Right_Talon_1, Right_Talon_2, Right_Talon_3, Left_Talon_1, Left_Talon_2, Left_Talon_3;
-	DoubleSolenoid Lift_Solenoid, Claw_Solenoid;
-	Timer Lift_Solenoid_Timer, Claw_Solenoid_Timer;
+	Joystick Joysticks[1];       // 0 = Joystick
+	Talon Talons[6];             // 0-2 = Right Talons, 3-5 = Left Talons
+	DoubleSolenoid Solenoids[2]; // 0 = Lift, 1 = Claw
+	Timer Timers[2];             // 0 = Lift Timer, 1 = Claw Timer
 
-	// Solenoid toggle variables
-	bool lift_solenoid_forward = false,
-	claw_solenoid_forward = false,
-	lift_solenoid_button_already_pressed = false,
-	claw_solenoid_button_already_pressed = false;
+	Robot();
 
-	Robot():
-		Joystick_1(PORT_JOYSTICK),
-		Right_Talon_1(PORT_RIGHT_TALON_1),
-		Right_Talon_2(PORT_RIGHT_TALON_2),
-		Right_Talon_3(PORT_RIGHT_TALON_3),
-		Left_Talon_1(PORT_LEFT_TALON_1),
-		Left_Talon_2(PORT_LEFT_TALON_2),
-		Left_Talon_3(PORT_LEFT_TALON_3),
-		Lift_Solenoid(PORT_1_LIFT_SOLENOID, PORT_2_LIFT_SOLENOID),
-		Claw_Solenoid(PORT_1_CLAW_SOLENOID, PORT_2_CLAW_SOLENOID)
-		{}
+	const float CYCLE_TIME_DELAY = 0.05;          // Time to wait between each cycle in seconds. No, don't set it to 0.. the motors won't have time to update.
+	const float SOLENOID_STATE_TIME_DELAY = 0.25; // Time to wait between toggling a solenoids state and turning the solenoid off (also in seconds)
 
-	void RobotInit(){}
+	void Autonomous();
+	void OperatorControl();
+};
 
-	void AutonomousInit(){}
+Robot::Robot(){
+	Joysticks[0](PORT_JOYSTICK);      // All of these constants are defined in RobotMap.h
+	Talons[0](PORT_RIGHT_TALON_1);
+	Talons[1](PORT_RIGHT_TALON_2);
+	Talons[2](PORT_RIGHT_TALON_3);
+	Talons[3](PORT_LEFT_TALON_1);
+	Talons[4](PORT_LEFT_TALON_2);
+	Talons[5](PORT_LEFT_TALON_3);
+	Solenoids[0](PORT_1_LIFT_SOLENOID, PORT_2_LIFT_SOLENOID);
+	Solenoids[1](PORT_1_CLAW_SOLENOID, PORT_2_CLAW_SOLENOID);
+}
 
-	void AutonomousPeriodic(){}
+void Robot::Autonomous(){}
 
-	void TeleopInit(){
-		// Set the state of the solenoids
-		Lift_Solenoid.Set(DoubleSolenoid::kReverse);
-		Claw_Solenoid.Set(DoubleSolenoid::kReverse);
-	}
+void Robot::OperatorControl(){
+	// Variables
+	float y, z, slider;                                           // Joystick floats
+	bool solenoid_buttons[2];                                     // Joystick booleans
+	float multiplier, right_speed, left_speed;                    // Calculate and store motor speeds
+	bool solenoid_forward[2], solenoid_button_already_pressed[2]; // Used to toggle solenoid states
 
-	void TeleopPeriodic(){
-		// Constants
-		const float SOLENOID_STATE_TIME_DELAY = 0.25;
+	// Set the already_pressed variables to false
+	for(int i = 0;i < 2;i++)
+		solenoid_button_already_pressed[i] = false;
 
+	// Set the default state of all solenoids and the variables that track their states. If you change one of the solenoid values, be sure to also change its respective variable.
+	Solenoids[0].Set(DoubleSolenoid::kReverse);
+	solenoid_forward[0] = false;
+	Solenoids[1].Set(DoubleSolenoid::kReverse);
+	solenoid_forward[1] = false;
+
+	while(IsOperatorControl() && IsEnabled()){
 		// Cache joystick values
-		float y = Joystick_1.GetY(),
-		z = Joystick_1.GetZ(),
-		slider = Joystick_1.GetThrottle();
-		bool lift_solenoid_button = Joystick_1.GetRawButton(2),
-		claw_solenoid_button = Joystick_1.GetRawButton(4);
+		y = Joysticks[0].GetY();
+		z = Joysticks[0].GetZ();
+		slider = Joysticks[0].GetThrottle();
+		solenoid_buttons[0] = Joysticks[0].GetRawButton(JOYSTICK_BUTTON_LIFT_SOLENOID); // Again, these two constants are defined in RobotMap.h
+		solenoid_buttons[1] = Joysticks[0].GetRawButton(JOYSTICK_BUTTON_CLAW_SOLENOID);
 
-		// Speed multiplier
-		float multiplier = 1 - ((slider + 1) / 2);
+		// Speed multiplier. The math takes the joystick's slider, reverses it, makes it 0-1
+		multiplier = 1 - ((slider + 1) / 2);
 
 		// Calculate motor speeds
-		float right_speed = multiplier * (y + z),
+		right_speed = multiplier * (y + z);
 		left_speed = -multiplier * (y - z);
 
 		// Drive
-		Right_Talon_1.Set(right_speed);
-		Right_Talon_2.Set(right_speed);
-		Right_Talon_3.Set(right_speed);
-		Left_Talon_1.Set(left_speed);
-		Left_Talon_2.Set(left_speed);
-		Left_Talon_3.Set(left_speed);
-
-		// Lift solenoid toggle
-		if(lift_solenoid_button && !lift_solenoid_button_already_pressed){
-			lift_solenoid_button_already_pressed = true;
-			if(lift_solenoid_forward){
-				lift_solenoid_forward = false;
-				Lift_Solenoid.Set(DoubleSolenoid::kForward);
-			}else{
-				lift_solenoid_forward = true;
-				Lift_Solenoid.Set(DoubleSolenoid::kReverse);
-			}
-			Lift_Solenoid_Timer.Reset();
-			Lift_Solenoid_Timer.Start();
-		}else if(!lift_solenoid_button){
-			lift_solenoid_button_already_pressed = false;
-		}
-		if(Lift_Solenoid_Timer.Get() > SOLENOID_STATE_TIME_DELAY){
-			Lift_Solenoid.Set(DoubleSolenoid::kOff);
-			Lift_Solenoid_Timer.Stop();
+		for(int i = 0;i < 5;i++){
+			if(i <= 3)
+				Talons[i].Set(right_speed);
+			else
+				Talons[i].Set(left_speed);
 		}
 
-		// Claw solenoid toggle
-		if(claw_solenoid_button && !claw_solenoid_button_already_pressed){
-			claw_solenoid_button_already_pressed = true;
-			if(claw_solenoid_forward){
-				claw_solenoid_forward = false;
-				Claw_Solenoid.Set(DoubleSolenoid::kForward);
-			}else{
-				claw_solenoid_forward = true;
-				Claw_Solenoid.Set(DoubleSolenoid::kReverse);
+		//Solenoid control
+		for(int i = 0;i < 2;i++){
+			if(solenoid_buttons[i] && !solenoid_button_already_pressed[i]){ // This section uses logic to toggle between the solenoid being forward or reverse
+				solenoid_button_already_pressed[i] = true;
+				if(solenoid_forward[i]){
+					solenoid_forward[i] = false;
+					Solenoids[i].Set(DoubleSolenoid::kForward);
+				}else{
+					solenoid_forward[i] = true;
+					Solenoids[i].Set(DoubleSolenoid::kReverse);
+				}
+				Timers[i].Start();
+			}else if(!solenoid_buttons[i]){
+				solenoid_button_already_pressed[i] = false;
 			}
-			Claw_Solenoid_Timer.Reset();
-			Claw_Solenoid_Timer.Start();
-		}else if(!claw_solenoid_button){
-			claw_solenoid_button_already_pressed = false;
+			if(Timers[i].Get() > SOLENOID_STATE_TIME_DELAY){ // This section waits for a short amount of time before turning the solenoid off again
+				Solenoids[i].Set(DoubleSolenoid::kOff);
+				Timers[i].Stop();
+				Timers[i].Reset();
+			}
 		}
-		if(Claw_Solenoid_Timer.Get() > SOLENOID_STATE_TIME_DELAY){
-			Claw_Solenoid.Set(DoubleSolenoid::kOff);
-			Claw_Solenoid_Timer.Stop();
-		}
+
+		//Wait before next cycle
+		Wait(CYCLE_TIME_DELAY);
 	}
-};
+}
 
 START_ROBOT_CLASS(Robot);
