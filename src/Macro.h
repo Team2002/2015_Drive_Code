@@ -25,7 +25,7 @@
 		// Tele-op code
 		
 		if(/* Button Pressed */)
-			SmartDashboard::PutString("Macro Being Recorded: ", Macro.StartRecording()); // Convert to string
+			SmartDashboard::PutString("Macro Being Recorded: ", Macro.StartRecording()); // Convert int to string
 		else if(/* Another Button Pressed */){
 			SmartDashboard::PutNumber("Macro Being Recorded: ", "None");
 			Macro.StopRecording();
@@ -92,6 +92,7 @@ private:
 		if(!is_recording) return;
 		
 		StepTimer->Stop();
+		StepTimer->Reset();
 		
 		// Save timer value ( StepTimer->Get() ) and passed parameters into log file
 		// Save passed robot parameters to the log file
@@ -106,6 +107,7 @@ private:
 		is_recording = false;
 		
 		StepTimer->Stop();
+		StepTimer->Reset();
 		
 		// Do anything needed to save and close the log file
 	}
