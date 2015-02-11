@@ -20,14 +20,16 @@
  
 	// Recording
 	
+	SmartDashboard::PutNumber(("Macro Being Recorded (-1 = Not Recording): ", -1);
+	
 	while(IsOperatorControl() && IsEnabled()){
 		
 		// Tele-op code
 		
-		if(/* Button Pressed */)
-			SmartDashboard::PutString("Macro Being Recorded: ", Macro.StartRecording()); // Convert int to string
-		else if(/* Another Button Pressed */){
-			SmartDashboard::PutNumber("Macro Being Recorded: ", "None");
+		if(/* Button Pressed */){
+			SmartDashboard::PutNumber("Macro Being Recorded (-1 = Not Recording): ", Macro.StartRecording());
+		}else if(/* Another Button Pressed */){
+			SmartDashboard::PutNumber(("Macro Being Recorded (-1 = Not Recording): ", -1);
 			Macro.StopRecording();
 		}
 			
