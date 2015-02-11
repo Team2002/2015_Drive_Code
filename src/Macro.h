@@ -3,67 +3,101 @@
 
 	For now, the only parameters that are passed to SaveStep are the left and right motor values, but once those work, other components can be added.
 
-	Usage examples are shown below. Basically, you just add the methods to your current tele-op program, and drive it like you normally would, then use the saved macros where ever they are needed.
+	Basically, you just add the methods to your current tele-op program, and drive it like you normally would, then use the saved macros where ever they are needed.
 
 	Not only could this be used for autonomous, but it could be used to create subroutines for use in tele-op.
 	
 	The main issue with this is the fact that battery voltage fluctuates over time, so if your battery has a different voltage than when the macro was recorded, then your results may vary.
 	
 	To Do / Ideas
-		-Use strings to name log files instead of characters
 		-White space deletion: remove any buffer time before and after the macro in which nothing is happening
 		-Create an Info method to get information about a macro (such as how long it takes to complete)
 		-Make a version of this that uses motor encoder data, rather than motor speed, to solve the voltage issue
  */
+ 
+ /* *** USAGE EXAMPLE *** */
+ 
+ 
+	// Recording
+	
+	while(IsOperatorControl() && IsEnabled()){
+		
+		// Tele-op code
+		
+		if(/* Button Pressed */)
+			SmartDashboard::PutString("Macro Being Recorded: ", Macro.StartRecording()); // Convert to string
+		else if(/* Another Button Pressed */){
+			SmartDashboard::PutNumber("Macro Being Recorded: ", "None");
+			Macro.StopRecording();
+		}
+			
+		Macro.SaveStep(right_speed, left_speed); // Note that if a macro is not being recorded, calling this function will just return back with no effect
+	}
 
+	
+	// Play back (macro number 5)
+	
+	if(Macro.Play(5)){
+		// Macro successfully completed
+	}else{
+		// Macro file cannot be found
+	}
+	
+	
+/* *** END OF USAGE EXAMPLE *** */
  
  
+
 #include "WPILib.h"
 
 class MacroRecorder{
 public:
 	MacroRecorder();
 
-	void StartRecording(const char log_file_name_passed);
+	int StartRecording(void); // Returns the name of the macro that is being recorded. Names of macros are integers to make them easier to deal with inside the program
 	void SaveStep(const float right_speed, const float left_speed);
 	void StopRecording(void);
 	
-	bool Play(const char log_file_name); // Returns false if the macro file cannot be found
+	bool Play(const int log_file_to_play); // Returns true if the macro exists (AFTER the macro has completed), or false if it does not
 	
 private:
-	Timer* StepTimer;             // This timer is used to time the length of time between steps
-	bool is_recording = false; // This will track if a macro is being recorded, and prevent multiple macros from being recorded at once
-	char log_file_name;          // This is set in StartRecording, and is referenced in SaveStep and StopRecording
+	Timer* StepTimer;
 	
 	
 	MacroRecorder(){
 		StepTimer = new Timer();
 	}
+	
+	
+	bool is_recording = false;
+	int log_file;
 
 	
-	void StartRecording(const char log_file_name_passed){
+	int StartRecording(void){
 		if(is_recording) return;
 		is_recording = true;
 		
-		log_file_name = log_file_name_passed;
+		// Check macros already created to determine name for new macro
+		// Set log_file to the name determined in the above step
+		// Make log file with the name stored in log_file
 		
-		// Create log file
+		StepTimer->Reset();
+		StepTimer->Start();
 		
-		StepTimer.Reset();
-		StepTimer.Start();
+		return log_file;
 	}
 
 	
 	void SaveStep(const float right_speed, const float left_speed){
 		if(!is_recording) return;
 		
-		StepTimer.Stop();
+		StepTimer->Stop();
 		
-		// Save timer value ( StepTimer.Get() ) and passed parameters into log file
+		// Save timer value ( StepTimer->Get() ) and passed parameters into log file
 		// Save passed robot parameters to the log file
 		
-		StepTimer.Reset();
-		StepTimer.Start();
+		StepTimer->Reset();
+		StepTimer->Start();
 	}
 	
 	
@@ -71,13 +105,13 @@ private:
 		if(!is_recording) return;
 		is_recording = false;
 		
-		StepTimer.Stop();
+		StepTimer->Stop();
 		
 		// Do anything needed to save and close the log file
 	}
 	
 	
-	bool Play(const char log_file_name){
+	bool Play(const int log_file_to_play){
 		if(/* log file does not exist */) return false;
 		
 		for(/* Iterate through steps */){
@@ -89,26 +123,4 @@ private:
 		
 		return true;
 	}
-} Macro; // An object of this class is automatically created, so that the methods can be accessed with Macro.method() without having to create another object
- 
- 
- 
- /* Usage Examples */
- 
-// Recording a macro
-Macro.StartRecording('a', true);  // If another file named "autonomous" exists, it will be overwritten because of the second argument bool overwrite
-while(IsOperatorControl() && IsEnabled()){ // This overwritting function is useful if you need to record a macro multiple times until you get it right
-	// Tele-op code
-	Macro.SaveStep(right_speed, left_speed);
-}
-Macro.StopRecording();
-
-
-// Playing a macro back
-if(Macro.Play('a')){
-	// Macro successfully completed
-}else{
-	// Macro file cannot be found
-}
-
-
+} Macro;
