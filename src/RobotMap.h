@@ -13,11 +13,6 @@
  ******************** */
 
  
- // Solenoid Default Position (TRUE = forward, FALSE = reverse)
-const bool SOLENOID_DEFAUlT_STATE[3];
-SOLENOID_DEFAUlT_STATE[0] = false; // Lift
-SOLENOID_DEFAUlT_STATE[1] = false; // Claw
-SOLENOID_DEFAUlT_STATE[2] = false; // Door
  
  // Joystick Mapping
 const int JOYSTICK_BUTTON_LIFT_SOLENOID = 2,
@@ -45,3 +40,9 @@ PORT_1_CLAW_SOLENOID = 2,
 PORT_2_CLAW_SOLENOID = 3,
 PORT_1_DOOR_SOLENOID = 4,
 PORT_2_DOOR_SOLENOID = 5;
+
+ // Solenoid Default Position (TRUE = forward, FALSE = reverse)
+const bool SOLENOID_DEFAUlT_STATE[NUMBER_OF_SOLENOIDS];
+SOLENOID_DEFAUlT_STATE[0] = false; // Lift
+SOLENOID_DEFAUlT_STATE[1] = false; // Claw
+SOLENOID_DEFAUlT_STATE[2] = false; // Door
