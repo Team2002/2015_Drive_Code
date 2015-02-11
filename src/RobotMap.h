@@ -1,4 +1,4 @@
-// This file maps all of the robot's electrical components and the joystick buttons
+// This file stores constants of the robot's electrical components, joystick mapping, and default solenoid states
 
 
 /* ********************
@@ -9,13 +9,27 @@
  * Speed Multiplier:     Slider
  * Lift Solenoid Toggle: Button 2
  * Claw Solenoid Toggle: Button 4
+ * Door Solenoid Toggle: Button 1
  ******************** */
 
+ 
+ // Solenoid Default Position (TRUE = forward, FALSE = reverse)
+const bool SOLENOID_DEFAUlT_STATE[3];
+SOLENOID_DEFAUlT_STATE[0] = false; // Lift
+SOLENOID_DEFAUlT_STATE[1] = false; // Claw
+SOLENOID_DEFAUlT_STATE[2] = false; // Door
+ 
+ // Joystick Mapping
+const int JOYSTICK_BUTTON_LIFT_SOLENOID = 2,
+JOYSTICK_BUTTON_CLAW_SOLENOID = 4,
+JOYSTICK_BUTTON_DOOR_SOLENOID = 1,
 
-// USB
-const int PORT_JOYSTICK = 0,
+// Joysticks
+NUMBER_OF_JOYSTICKS = 1,
+PORT_JOYSTICK = 0,
 
-// PWM
+// Talons
+NUMBER_OF_TALONS = 6,
 PORT_RIGHT_TALON_1 = 1,
 PORT_RIGHT_TALON_2 = 2,
 PORT_RIGHT_TALON_3 = 3,
@@ -24,14 +38,10 @@ PORT_LEFT_TALON_2 = 6,
 PORT_LEFT_TALON_3 = 7,
 
 // Solenoids
+NUMBER_OF_SOLENOIDS = 3,
 PORT_1_LIFT_SOLENOID = 0,
 PORT_2_LIFT_SOLENOID = 1,
 PORT_1_CLAW_SOLENOID = 2,
 PORT_2_CLAW_SOLENOID = 3,
 PORT_1_DOOR_SOLENOID = 4,
-PORT_2_DOOR_SOLENOID = 5,
-
-// Joystick Mapping
-JOYSTICK_BUTTON_LIFT_SOLENOID = 2,
-JOYSTICK_BUTTON_CLAW_SOLENOID = 4,
-JOYSTICK_BUTTON_DOOR_SOLENOID = 1;
+PORT_2_DOOR_SOLENOID = 5;
