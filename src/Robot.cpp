@@ -5,7 +5,7 @@ class Robot: public SampleRobot{
 public:
 	Joystick* Joysticks[1];       // 0 = Joystick
 	Talon* Talons[6];             // 0-2 = Right Talons, 3-5 = Left Talons
-	DoubleSolenoid* Solenoids[2]; // 0 = Lift, 1 = Claw
+	DoubleSolenoid* Solenoids[3]; // 0 = Lift, 1 = Claw, 2 = Door
 	Timer* Timers[2];             // 0 = Lift Timer, 1 = Claw Timer
 
 	Robot();
@@ -27,8 +27,10 @@ Robot::Robot(){
 	Talons[5] = new Talon(PORT_LEFT_TALON_3);
 	Solenoids[0] = new DoubleSolenoid(PORT_1_LIFT_SOLENOID, PORT_2_LIFT_SOLENOID);
 	Solenoids[1] = new DoubleSolenoid(PORT_1_CLAW_SOLENOID, PORT_2_CLAW_SOLENOID);
+	Solenoids[2] = new DoubleSolenoid(PORT_1_DOOR_SOLENOID, PORT_2_DOOR_SOLENOID);
 	Timers[0] = new Timer();
 	Timers[1] = new Timer();
+	Timers[2] = new Timer();
 }
 
 void Robot::Autonomous(){
@@ -38,18 +40,20 @@ void Robot::Autonomous(){
 void Robot::OperatorControl(){
 	// Variables
 	float y, z, slider;                                           // Joystick floats
-	bool solenoid_buttons[2];                                     // Joystick booleans
+	bool solenoid_buttons[3];                                     // Joystick booleans
 	float right_speed, left_speed;                                // Motor speeds
-	bool solenoid_forward[2], solenoid_button_already_pressed[2]; // Used to toggle solenoid states
+	bool solenoid_forward[3], solenoid_button_already_pressed[3]; // Used to toggle solenoid states
 
 	// Set the already_pressed variables to false
-	for(int i = 0;i < 2;i++)
+	for(int i = 0;i < 3;i++)
 		solenoid_button_already_pressed[i] = false;
 
 	// Set the default state of all solenoids and the variables that track their states. If you change one of the solenoid states, be sure to also change its respective variable
 	Solenoids[0]->Set(DoubleSolenoid::kReverse); // Solenoids can be either forward, reverse, or off (kForward, kReverse, kOff)
 	solenoid_forward[0] = false;
 	Solenoids[1]->Set(DoubleSolenoid::kReverse);
+	solenoid_forward[1] = false;
+	Solenoids[2]->Set(DoubleSolenoid::kReverse);
 	solenoid_forward[1] = false;
 
 	while(IsOperatorControl() && IsEnabled()){
@@ -59,6 +63,7 @@ void Robot::OperatorControl(){
 		slider = Joysticks[0]->GetThrottle();
 		solenoid_buttons[0] = Joysticks[0]->GetRawButton(JOYSTICK_BUTTON_LIFT_SOLENOID); // These two constants are defined in RobotMap.h in the "Joystick Mapping" section
 		solenoid_buttons[1] = Joysticks[0]->GetRawButton(JOYSTICK_BUTTON_CLAW_SOLENOID);
+		solenoid_buttons[2] = Joysticks[0]->GetRawButton(JOYSTICK_BUTTON_DOOR_SOLENOID);
 
 		// Calculate motor speeds.
 		right_speed = (1 - ((slider + 1) / 2)) * (y + z); // This math takes the slider's input and converts it from -1 - 1 to 1 - 0, then uses that as a speed multiplier
@@ -73,7 +78,7 @@ void Robot::OperatorControl(){
 		}
 
 		//Solenoid control
-		for(int i = 0;i < 2;i++){
+		for(int i = 0;i < 3;i++){
 			if(solenoid_buttons[i] && !solenoid_button_already_pressed[i]){ // This section uses logic to toggle between the solenoid being forward or reverse
 				solenoid_button_already_pressed[i] = true;                  // Since all of the solenoids and solenoid variables are arrays, they can be looped
 				if(solenoid_forward[i]){
@@ -93,8 +98,6 @@ void Robot::OperatorControl(){
 				Timers[i]->Reset();
 			}
 		}
-
-		SmartDashboard::PutNumber("Number", 666);
 
 		//Wait before next cycle
 		Wait(CYCLE_TIME_DELAY);
