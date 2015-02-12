@@ -1,5 +1,6 @@
 #include "WPILib.h"
 #include "RobotMap.h"
+#include "Macro.h"
 
 class Robot: public SampleRobot{
 public:
@@ -7,6 +8,7 @@ public:
 	Talon* Talons[NUMBER_OF_TALONS];                // 0-2 = Right Talons, 3-5 = Left Talons
 	DoubleSolenoid* Solenoids[NUMBER_OF_SOLENOIDS]; // 0 = Lift, 1 = Claw, 2 = Door
 	Timer* Timers[NUMBER_OF_SOLENOIDS];             // 0 = Lift Timer, 1 = Claw Timer, 2 = Door Timer
+	MacroRecorder Macro;                            // Allows the recording and playback of macros [in progress..]
 
 	Robot();
 
@@ -44,18 +46,13 @@ void Robot::OperatorControl(){
 	float right_speed, left_speed;              // Motor speeds
 	bool solenoid_forward[NUMBER_OF_SOLENOIDS], solenoid_button_already_pressed[NUMBER_OF_SOLENOIDS]; // Used to toggle solenoid states
 
-	// Set the solenoids to their default states
+	// Set all solenoids in reverse
 	for(int i = 0;i < NUMBER_OF_SOLENOIDS;i++){
-		if(SOLENOID_DEFAUlT_STATE[i]){
-			Solenoids[i]->Set(DoubleSolenoid::kForward);
-			solenoid_forward[i] = true;
-		}else{
-			Solenoids[i]->Set(DoubleSolenoid::kReverse);
-			solenoid_forward[i] = false;
-		}
-		solenoid_button_already_pressed[i] = false; // These need to be set to false as a starting point for the solenoid toggle function
+		Solenoids[i]->Set(DoubleSolenoid::kReverse);
+		solenoid_forward[i] = false;
+		solenoid_button_already_pressed[i] = false; // These also need to be set before the tele-op loop begins, so I'll juse do that here
 	}
-		
+
 	// Set the solenoids back off
 	Wait(SOLENOID_STATE_TIME_DELAY);
 	for(int i = 0;i < NUMBER_OF_SOLENOIDS;i++)
