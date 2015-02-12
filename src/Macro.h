@@ -54,6 +54,13 @@ int MacroRecorder::StartRecording(void){
 
 void MacroRecorder::SaveStep(float right_speed, float left_speed){
 	if(!is_recording) return;
+	StepTimer->Stop();
+	StepTimer->Reset();
+	
+	// Save everything to log file
+	
+	StepTimer->Reset();
+	StepTimer->Start();
 }
 
 
