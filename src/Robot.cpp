@@ -36,7 +36,22 @@ Robot::Robot(){
 }
 
 void Robot::Autonomous(){
-	// No autonomous code yet
+	// This will be used to test the macro methods. It should create a .csv file with the data saved to it.
+	SmartDashboard::PutString("Done recording: ", "NO");
+	Macro.StartRecording();
+	Wait(0.5);
+	Macro.SaveStep(0.25, 0.75, 0, 0, 1);
+	Wait(2);
+	Macro.SaveStep(0.5, 0.75, 0, 2, 0);
+	Wait(2);
+	Macro.SaveStep(0.25, 0.75, 1, 1, 1);
+	Wait(1);
+	Macro.SaveStep(0.6, 0.75, 0, 1, 2);
+	Wait(1);
+	Macro.SaveStep(0.25, 0.75, 2, 2, 0);
+	Wait(0.75);
+	Macro.StopRecording();
+	SmartDashboard::PutString("Done recording: ", "YES");
 }
 
 void Robot::OperatorControl(){
