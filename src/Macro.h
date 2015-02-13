@@ -6,24 +6,37 @@
 
 class MacroRecorder{
 public:
-	Timer* StepTimer;
-	FILE* file;
-
 	MacroRecorder();
 
-	bool is_recording;
-
-	int StartRecording(void);
-	void SaveStep(float right_speed, float left_speed);
+	int StartRecording(void); 
+	void SaveStep(const float right_speed, const float left_speed, const int lift_state, const int claw_state, const int door_state);
 	void StopRecording(void);
 
-	bool Play(int file_number);
+	int Play(const int file_number);
+	
+	/* **********
+	-- Return Values for Non-Void Functions --
+	
+		* StartRecording:
+			-1 = another macro is currently being recorded (a new macro won't be recorded)
+			other int = file number that is now being recorded on
+		
+		* Play:
+			0 = macro completed successfully 
+			1 = another macro is currently being recorded (called macro won't play) 
+			2 = file cannot be found
+	********** */
+	
+private:
+	Timer* StepTimer;
+	FILE* File;
+	bool is_recording;
 };
 
 
 MacroRecorder::MacroRecorder(){
 	StepTimer = new Timer();
-	file = new FILE();
+	File = new FILE();
 	is_recording = false;
 }
 
@@ -35,15 +48,15 @@ int MacroRecorder::StartRecording(void){
 	int log_file = 0;
 
 	while(true){
-		file = fopen(("/home/lvuser/" + std::to_string(log_file) + ".txt").c_str(), "r");
+		File = fopen(("/home/lvuser/" + std::to_string(log_file) + ".csv").c_str(), "r");
 
-		if(file == NULL)
+		if(File == NULL)
 			break;
 		else
 			log_file++;
 	}
 
-	file = fopen(("/home/lvuser/" + std::to_string(log_file) + ".txt").c_str(), "w");
+	File = fopen(("/home/lvuser/" + std::to_string(log_file) + ".csv").c_str(), "w");
 
 	StepTimer->Reset();
 	StepTimer->Start();
@@ -52,12 +65,12 @@ int MacroRecorder::StartRecording(void){
 }
 
 
-void MacroRecorder::SaveStep(float right_speed, float left_speed){
+void MacroRecorder::SaveStep(const float right_speed, const float left_speed, const int lift_state, const int claw_state, const int door_state){
 	if(!is_recording) return;
-	StepTimer->Stop();
-	StepTimer->Reset();
 	
-	// Save everything to log file
+	StepTimer->Stop();
+	
+	fprintf(File, "%f,%f,%f,%d,%d,%d\n", StepTimer->Get(), right_speed, left_speed, lift_state, claw_state, door_state);
 	
 	StepTimer->Reset();
 	StepTimer->Start();
@@ -69,14 +82,20 @@ void MacroRecorder::StopRecording(void){
 	is_recording = false;
 
 	StepTimer->Stop();
-	StepTimer->Reset();
 
-	fclose(file);
+	fclose(File);
 }
 
 
-bool MacroRecorder::Play(int file_number){
-	if(is_recording) return false;
+int MacroRecorder::Play(const int file_number){
+	if(is_recording) return 1;
 
-	return true;
+	File = fopen(("/home/lvuser/" + std::to_string(file_number) + ".csv").c_str(), "r");
+	if(File == NULL) return 2;
+	
+	// Playback
+	
+	fclose(File);
+
+	return 0;
 }
