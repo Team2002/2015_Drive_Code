@@ -8,11 +8,11 @@ public:
 	Talon* Talons[NUMBER_OF_TALONS];                // 0-2 = Right Talons, 3-5 = Left Talons
 	DoubleSolenoid* Solenoids[NUMBER_OF_SOLENOIDS]; // 0 = Lift, 1 = Claw, 2 = Door
 	Timer* Timers[NUMBER_OF_SOLENOIDS];             // 0 = Lift Timer, 1 = Claw Timer, 2 = Door Timer
-	MacroRecorder Macro;                            // Allows the recording and playback of macros [in progress..]
+	MacroRecorder* Macro;
 
 	Robot();
 
-	const float CYCLE_TIME_DELAY = 0.005, // Time to wait in seconds between each cycle. This gives the motors time to update
+	const float CYCLE_TIME_DELAY = 0.020, // Time to wait in seconds between each cycle. This gives the motors time to update
 	SOLENOID_STATE_TIME_DELAY = 0.25;     // Time to wait in seconds between toggling a solenoid's state and turning the solenoid off
 
 	void Autonomous();
@@ -33,6 +33,7 @@ Robot::Robot(){
 	Timers[0] = new Timer();
 	Timers[1] = new Timer();
 	Timers[2] = new Timer();
+	Macro = new MacroRecorder();
 }
 
 void Robot::Autonomous(){
@@ -40,23 +41,34 @@ void Robot::Autonomous(){
 }
 
 void Robot::OperatorControl(){
+	//Start recording macro
+	SmartDashboard::PutNumber("Macro Being Recorded (-1 = not recording): ", Macro->StartRecording());
+
 	// Variables
 	float y, z, slider;                         // Joystick floats
 	bool solenoid_buttons[NUMBER_OF_SOLENOIDS]; // Joystick booleans
 	float right_speed, left_speed;              // Motor speeds
+	int solenoid_state[NUMBER_OF_SOLENOIDS];    // 0 = Off, 1 = Forward, 2 = Reverse
 	bool solenoid_forward[NUMBER_OF_SOLENOIDS], solenoid_button_already_pressed[NUMBER_OF_SOLENOIDS]; // Used to toggle solenoid states
 
 	// Set all solenoids in reverse
 	for(int i = 0;i < NUMBER_OF_SOLENOIDS;i++){
 		Solenoids[i]->Set(DoubleSolenoid::kReverse);
+		solenoid_state[i] = 2;
 		solenoid_forward[i] = false;
-		solenoid_button_already_pressed[i] = false; // These also need to be set before the tele-op loop begins, so I'll juse do that here
+		solenoid_button_already_pressed[i] = false; // These also need to be set before the tele-op loop begins, so I'll just do that here
 	}
+
+	Macro->SaveStep(0, 0, solenoid_state[0], solenoid_state[1], solenoid_state[2]);
 
 	// Set the solenoids back off
 	Wait(SOLENOID_STATE_TIME_DELAY);
-	for(int i = 0;i < NUMBER_OF_SOLENOIDS;i++)
+	for(int i = 0;i < NUMBER_OF_SOLENOIDS;i++){
 		Solenoids[i]->Set(DoubleSolenoid::kOff);
+		solenoid_state[i] = 0;
+	}
+
+	Macro->SaveStep(0, 0, solenoid_state[0], solenoid_state[1], solenoid_state[2]);
 	
 	while(IsOperatorControl() && IsEnabled()){
 		// Cache joystick values
@@ -86,9 +98,11 @@ void Robot::OperatorControl(){
 				if(solenoid_forward[i]){
 					Solenoids[i]->Set(DoubleSolenoid::kReverse);
 					solenoid_forward[i] = false;
+					solenoid_state[i] = 2;
 				}else{
 					Solenoids[i]->Set(DoubleSolenoid::kForward);
 					solenoid_forward[i] = true;
+					solenoid_state[i] = 1;
 				}
 				Timers[i]->Reset();
 				Timers[i]->Start();
@@ -97,14 +111,22 @@ void Robot::OperatorControl(){
 			}
 			if(Timers[i]->Get() > SOLENOID_STATE_TIME_DELAY){ // This section waits for a short amount of time before turning the solenoid off again
 				Solenoids[i]->Set(DoubleSolenoid::kOff);
+				solenoid_state[i] = 0;
 				Timers[i]->Stop();
 				Timers[i]->Reset();
 			}
 		}
 
+		// Record macro step
+		Macro->SaveStep(left_speed, right_speed, solenoid_state[0], solenoid_state[1], solenoid_state[2]);
+
 		//Wait before next cycle
 		Wait(CYCLE_TIME_DELAY);
 	}
+
+	// Stop recording macro
+	Macro->StopRecording();
+	SmartDashboard::PutNumber("Macro Being Recorded (-1 = not recording): ", -1);
 }
 
 START_ROBOT_CLASS(Robot);
