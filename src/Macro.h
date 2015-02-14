@@ -25,7 +25,7 @@ public:
 		
 		* Play:
 			0 = macro completed successfully 
-			1 = a macro is currently being recorded (called macro won't play) 
+			1 = another macro is currently being recorded (called macro won't play) 
 			2 = file cannot be found
 	********** */
 	
