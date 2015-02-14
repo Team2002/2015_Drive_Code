@@ -11,10 +11,10 @@ public:
 	~MacroRecorder();
 
 	void StartRecording(void);
-	void SaveStep(float, float, int, int, int);
+	void SaveStep(float, float, int, int, int, int, int, int);
 	void StopRecording(void);
 
-	void Play(const int, Talon*[6], DoubleSolenoid*[3]);
+	void Play(const int, Talon*[NUMBER_OF_TALONS], DoubleSolenoid*[NUMBER_OF_SOLENOIDS]);
 	
 	/* **********
 	-- Return Values for Non-Void Functions --
@@ -73,12 +73,12 @@ void MacroRecorder::StartRecording(void){
 }
 
 
-void MacroRecorder::SaveStep(float left_speed, float right_speed, int lift_state, int claw_state, int door_state){
+void MacroRecorder::SaveStep(float left_speed, float right_speed, int left_intake_state, int right_intake_state, int lift_state, int claw_state, int intake_state, int door_state){
 	if(!is_recording) return;
 	
 	StepTimer->Stop();
 	
-	fprintf(File, "%f,%f,%f,%d,%d,%d\n", StepTimer->Get(), left_speed, right_speed, lift_state, claw_state, door_state);
+	fprintf(File, "%f,%f,%f,%d,%d,%d,%d,%d,%d\n", StepTimer->Get(), left_speed, right_speed, left_intake_state, right_intake_state, lift_state, claw_state, intake_state, door_state);
 	
 	StepTimer->Reset();
 	StepTimer->Start();
@@ -102,20 +102,34 @@ void MacroRecorder::Play(const int file_number, Talon* Talons[NUMBER_OF_TALONS],
 	if(File == NULL) return;
 
 	float time, left_speed, right_speed;
-	int lift_state, claw_state, door_state;
+	int left_intake_state, right_intake_state, lift_state, claw_state, intake_state, door_state;
 	
 	while(true){
-		if(fscanf(File, "%f,%f,%f,%d,%d,%d\n", &time, &left_speed, &right_speed, &lift_state, &claw_state, &door_state) < 6)
+		if(fscanf(File, "%f,%f,%f,%d,%d,%d,%d,%d,%d\n", &time, &left_speed, &right_speed, &left_intake_state, &right_intake_state, &lift_state, &claw_state, &intake_state, &door_state) < 6)
 			break;
 
 		Wait(time);
 
-		for(int i = 0;i < NUMBER_OF_TALONS;i++){
-			if(i < NUMBER_OF_TALONS / 2)
+		for(int i = 0;i < NUMBER_OF_TALONS - 2;i++){
+			if(i < (NUMBER_OF_TALONS - 2) / 2)
 				Talons[i]->Set(right_speed);
 			else
 				Talons[i]->Set(left_speed);
 		}
+
+		if(left_intake_state == 0)
+			Talons[PORT_LEFT_INTAKE_TALON]->Set(0);
+		if(left_intake_state == 1)
+			Talons[PORT_LEFT_INTAKE_TALON]->Set(INTAKE_SPEED);
+		if(left_intake_state == 2)
+			Talons[PORT_LEFT_INTAKE_TALON]->Set(-INTAKE_SPEED);
+
+		if(right_intake_state == 0)
+			Talons[PORT_RIGHT_INTAKE_TALON]->Set(0);
+		if(right_intake_state == 1)
+			Talons[PORT_RIGHT_INTAKE_TALON]->Set(INTAKE_SPEED);
+		if(right_intake_state == 2)
+			Talons[PORT_RIGHT_INTAKE_TALON]->Set(-INTAKE_SPEED);
 
 		if(lift_state == 0){
 			Solenoids[0]->Set(DoubleSolenoid::kOff);
@@ -143,15 +157,12 @@ void MacroRecorder::Play(const int file_number, Talon* Talons[NUMBER_OF_TALONS],
 	}
 
 	for(int i = 0;i < NUMBER_OF_TALONS;i++){
-		if(i < NUMBER_OF_TALONS / 2)
-			Talons[i]->Set(0);
-		else
-			Talons[i]->Set(0);
+		Talons[i]->Set(0);
 	}
 
-	Solenoids[0]->Set(DoubleSolenoid::kOff);
-	Solenoids[1]->Set(DoubleSolenoid::kOff);
-	Solenoids[2]->Set(DoubleSolenoid::kOff);
+	for(int i = 0;i < NUMBER_OF_SOLENOIDS;i++){
+		Solenoids[i]->Set(DoubleSolenoid::kOff);
+	}
 
 	fclose(File);
 
