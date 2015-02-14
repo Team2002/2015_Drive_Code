@@ -1,5 +1,5 @@
 #include "WPILib.h"
-#include <stdarg.h>
+#include "RobotMap.h"
 #include <iostream>
 #include <string>
 #include <cstdio>
@@ -8,12 +8,13 @@
 class MacroRecorder{
 public:
 	MacroRecorder();
+	~MacroRecorder();
 
-	int StartRecording(void); 
+	void StartRecording(void);
 	void SaveStep(float, float, int, int, int);
 	void StopRecording(void);
 
-	int Play(const int);
+	void Play(const int, Talon*[6], DoubleSolenoid*[3]);
 	
 	/* **********
 	-- Return Values for Non-Void Functions --
@@ -42,8 +43,14 @@ MacroRecorder::MacroRecorder(){
 }
 
 
-int MacroRecorder::StartRecording(void){
-	if(is_recording) return -1;
+MacroRecorder::~MacroRecorder(){
+	delete StepTimer;
+	delete File;
+}
+
+
+void MacroRecorder::StartRecording(void){
+	if(is_recording) return;
 	is_recording = true;
 
 	int log_file = 0;
@@ -62,7 +69,7 @@ int MacroRecorder::StartRecording(void){
 	StepTimer->Reset();
 	StepTimer->Start();
 
-	return log_file;
+	return;
 }
 
 
@@ -88,15 +95,65 @@ void MacroRecorder::StopRecording(void){
 }
 
 
-int MacroRecorder::Play(const int file_number){
-	if(is_recording) return 1;
+void MacroRecorder::Play(const int file_number, Talon* Talons[NUMBER_OF_TALONS], DoubleSolenoid* Solenoids[NUMBER_OF_SOLENOIDS]){
+	if(is_recording) return;
 
 	File = fopen(("/home/lvuser/" + std::to_string(file_number) + ".csv").c_str(), "r");
-	if(File == NULL) return 2;
+	if(File == NULL) return;
+
+	float time, left_speed, right_speed;
+	int lift_state, claw_state, door_state;
 	
-	// Playback
+	while(true){
+		if(fscanf(File, "%f,%f,%f,%d,%d,%d\n", &time, &left_speed, &right_speed, &lift_state, &claw_state, &door_state) < 6)
+			break;
+
+		Wait(time);
+
+		for(int i = 0;i < NUMBER_OF_TALONS;i++){
+			if(i < NUMBER_OF_TALONS / 2)
+				Talons[i]->Set(right_speed);
+			else
+				Talons[i]->Set(left_speed);
+		}
+
+		if(lift_state == 0){
+			Solenoids[0]->Set(DoubleSolenoid::kOff);
+		}else if(lift_state == 1){
+			Solenoids[0]->Set(DoubleSolenoid::kForward);
+		}else if(lift_state == 2){
+			Solenoids[0]->Set(DoubleSolenoid::kReverse);
+		}
+
+		if(claw_state == 0){
+			Solenoids[1]->Set(DoubleSolenoid::kOff);
+		}else if(claw_state == 1){
+			Solenoids[1]->Set(DoubleSolenoid::kForward);
+		}else if(claw_state == 2){
+			Solenoids[1]->Set(DoubleSolenoid::kReverse);
+		}
+
+		if(door_state == 0){
+			Solenoids[2]->Set(DoubleSolenoid::kOff);
+		}else if(door_state == 1){
+			Solenoids[2]->Set(DoubleSolenoid::kForward);
+		}else if(door_state == 2){
+			Solenoids[2]->Set(DoubleSolenoid::kReverse);
+		}
+	}
+
+	for(int i = 0;i < NUMBER_OF_TALONS;i++){
+		if(i < NUMBER_OF_TALONS / 2)
+			Talons[i]->Set(0);
+		else
+			Talons[i]->Set(0);
+	}
+
+	Solenoids[0]->Set(DoubleSolenoid::kOff);
+	Solenoids[1]->Set(DoubleSolenoid::kOff);
+	Solenoids[2]->Set(DoubleSolenoid::kOff);
 
 	fclose(File);
 
-	return 0;
+	return;
 }

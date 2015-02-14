@@ -1,5 +1,4 @@
 #include "WPILib.h"
-#include "RobotMap.h"
 #include "Macro.h"
 
 class Robot: public SampleRobot{
@@ -8,25 +7,26 @@ public:
 	Talon* Talons[NUMBER_OF_TALONS];                // 0-2 = Right Talons, 3-5 = Left Talons
 	DoubleSolenoid* Solenoids[NUMBER_OF_SOLENOIDS]; // 0 = Lift, 1 = Claw, 2 = Door
 	Timer* Timers[NUMBER_OF_SOLENOIDS];             // 0 = Lift Timer, 1 = Claw Timer, 2 = Door Timer
-	MacroRecorder* Macro;
+	MacroRecorder* Macro;                           // Object to record and play back macros
 
 	Robot();
+	~Robot();
 
 	const float CYCLE_TIME_DELAY = 0.020, // Time to wait in seconds between each cycle. This gives the motors time to update
 	SOLENOID_STATE_TIME_DELAY = 0.25;     // Time to wait in seconds between toggling a solenoid's state and turning the solenoid off
 
+	void RobotInit();
 	void Autonomous();
 	void OperatorControl();
 };
+
 
 Robot::Robot(){
 	Joysticks[0] = new Joystick(PORT_JOYSTICK);
 	Talons[0] = new Talon(PORT_RIGHT_TALON_1);
 	Talons[1] = new Talon(PORT_RIGHT_TALON_2);
-	Talons[2] = new Talon(PORT_RIGHT_TALON_3);
-	Talons[3] = new Talon(PORT_LEFT_TALON_1);
-	Talons[4] = new Talon(PORT_LEFT_TALON_2);
-	Talons[5] = new Talon(PORT_LEFT_TALON_3);
+	Talons[2] = new Talon(PORT_LEFT_TALON_1);
+	Talons[3] = new Talon(PORT_LEFT_TALON_2);
 	Solenoids[0] = new DoubleSolenoid(PORT_1_LIFT_SOLENOID, PORT_2_LIFT_SOLENOID);
 	Solenoids[1] = new DoubleSolenoid(PORT_1_CLAW_SOLENOID, PORT_2_CLAW_SOLENOID);
 	Solenoids[2] = new DoubleSolenoid(PORT_1_DOOR_SOLENOID, PORT_2_DOOR_SOLENOID);
@@ -36,13 +36,37 @@ Robot::Robot(){
 	Macro = new MacroRecorder();
 }
 
-void Robot::Autonomous(){
-	// No autonomous code yet
+
+Robot::~Robot(){
+	for(int i = 0;i < NUMBER_OF_JOYSTICKS;i++)
+		delete Joysticks[i];
+
+	for(int i = 0;i < NUMBER_OF_TALONS;i++)
+		delete Talons[i];
+
+	for(int i = 0;i < NUMBER_OF_SOLENOIDS;i++)
+		delete Solenoids[i];
+
+	for(int i = 0;i < NUMBER_OF_SOLENOIDS;i++)
+		delete Timers[i];
+
+	delete Macro;
 }
+
+
+void Robot::RobotInit(){
+
+}
+
+
+void Robot::Autonomous(){
+	Macro->Play(0, Talons, Solenoids);
+}
+
 
 void Robot::OperatorControl(){
 	//Start recording macro
-	SmartDashboard::PutNumber("Macro Being Recorded (-1 = not recording): ", Macro->StartRecording());
+	Macro->StartRecording();
 
 	// Variables
 	float y, z, slider;                         // Joystick floats
@@ -126,7 +150,6 @@ void Robot::OperatorControl(){
 
 	// Stop recording macro
 	Macro->StopRecording();
-	SmartDashboard::PutNumber("Macro Being Recorded (-1 = not recording): ", -1);
 }
 
 START_ROBOT_CLASS(Robot);
