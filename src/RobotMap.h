@@ -1,10 +1,28 @@
 // This file stores constants of the robot's electrical components, joystick mapping, and other constants
 
 
+/*
+	-- Joystick 1 --
+	Y-Axis: Forward / Reverse
+	Z-Axis: Turning
+	Slider: Speed Multiplier
+
+	-- Joystick 2 --
+	A: Claw
+	B: Door
+	X: Intake
+	Y: Lift
+	LB: Left Intake In
+	LT: Left Intake Out
+	RB: Right Intake In
+	RT: Right Intake Out
+*/
+
+
 // Other constants
 const int AUTONOMOUS_PROGRAM = 0;     // Macro file number to play in autonomous mode
 const float CYCLE_TIME_DELAY = 0.020, // Time to wait in seconds between each cycle. This gives the motors time to update
-SOLENOID_STATE_TIME_DELAY = 0.25,     // Time to wait in seconds between toggling a solenoid's state and turning the solenoid off
+SOLENOID_STATE_TIME_DELAY = 1,        // Time to wait in seconds between toggling a solenoid's state and turning the solenoid off
 INTAKE_SPEED = 0.3;                   // Speed to run the intake motors when taking in bins and totes
 
 // Joystick 2 Mapping
@@ -33,11 +51,11 @@ PORT_LEFT_INTAKE_TALON = 0,
 
 // Solenoids
 NUMBER_OF_SOLENOIDS = 4,
-PORT_1_LIFT_SOLENOID = 0,
-PORT_2_LIFT_SOLENOID = 1,
+PORT_1_LIFT_SOLENOID = 2,
+PORT_2_LIFT_SOLENOID = 3,
 PORT_1_CLAW_SOLENOID = 4,
 PORT_2_CLAW_SOLENOID = 5,
-PORT_1_INTAKE_SOLENOID = 2,
-PORT_2_INTAKE_SOLENOID = 3,
+PORT_1_INTAKE_SOLENOID = 0,
+PORT_2_INTAKE_SOLENOID = 1,
 PORT_1_DOOR_SOLENOID = 6,
 PORT_2_DOOR_SOLENOID = 7;

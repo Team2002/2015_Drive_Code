@@ -7,11 +7,13 @@ public:
 	Talon* Talons[NUMBER_OF_TALONS];                // 0-2 = Right Talons, 3-5 = Left Talons
 	DoubleSolenoid* Solenoids[NUMBER_OF_SOLENOIDS]; // 0 = Lift, 1 = Claw, 2 = Door
 	Timer* Timers[NUMBER_OF_SOLENOIDS];             // 0 = Lift Timer, 1 = Claw Timer, 2 = Door Timer
+	Compressor* AirCompressor;
 	MacroRecorder* Macro;                           // Object to record and play back macros
 
 	Robot();
 	~Robot();
 
+	void RobotInit();       // Called when the program loads
 	void Autonomous();      // Called on start of autonomous
 	void OperatorControl(); // Called on start of tele-op
 };
@@ -20,12 +22,12 @@ public:
 Robot::Robot(){
 	Joysticks[0] = new Joystick(PORT_JOYSTICK_1);
 	Joysticks[1] = new Joystick(PORT_JOYSTICK_2);
-	Talons[0] = new Talon(PORT_RIGHT_TALON_1);
-	Talons[1] = new Talon(PORT_RIGHT_TALON_2);
+	Talons[0] = new Talon(PORT_LEFT_INTAKE_TALON);
+	Talons[1] = new Talon(PORT_RIGHT_INTAKE_TALON);
 	Talons[2] = new Talon(PORT_LEFT_TALON_1);
 	Talons[3] = new Talon(PORT_LEFT_TALON_2);
-	Talons[4] = new Talon(PORT_RIGHT_INTAKE_TALON);
-	Talons[5] = new Talon(PORT_LEFT_INTAKE_TALON);
+	Talons[4] = new Talon(PORT_RIGHT_TALON_1);
+	Talons[5] = new Talon(PORT_RIGHT_TALON_2);
 	Solenoids[0] = new DoubleSolenoid(PORT_1_LIFT_SOLENOID, PORT_2_LIFT_SOLENOID);
 	Solenoids[1] = new DoubleSolenoid(PORT_1_CLAW_SOLENOID, PORT_2_CLAW_SOLENOID);
 	Solenoids[2] = new DoubleSolenoid(PORT_1_INTAKE_SOLENOID, PORT_2_INTAKE_SOLENOID);
@@ -33,6 +35,8 @@ Robot::Robot(){
 	Timers[0] = new Timer();
 	Timers[1] = new Timer();
 	Timers[2] = new Timer();
+	Timers[3] = new Timer();
+	AirCompressor = new Compressor();
 	Macro = new MacroRecorder();
 }
 
@@ -54,6 +58,11 @@ Robot::~Robot(){
 }
 
 
+void Robot::RobotInit(){
+	AirCompressor->Start();
+}
+
+
 void Robot::Autonomous(){
 	Macro->Play(AUTONOMOUS_PROGRAM, Talons, Solenoids);
 }
@@ -61,7 +70,7 @@ void Robot::Autonomous(){
 
 void Robot::OperatorControl(){
 	//Start recording macro
-	Macro->StartRecording();
+	//Macro->StartRecording();
 
 	// Variables
 	float y, z, slider;                         // Joystick floats
@@ -79,7 +88,7 @@ void Robot::OperatorControl(){
 		solenoid_button_already_pressed[i] = false; // These also need to be set before the tele-op loop begins, so I'll just do that here
 	}
 
-	Macro->SaveStep(0, 0, 0, 0, solenoid_state[0], solenoid_state[1], solenoid_state[2], solenoid_state[3]);
+	//Macro->SaveStep(0, 0, 0, 0, solenoid_state[0], solenoid_state[1], solenoid_state[2], solenoid_state[3]);
 
 	// Set the solenoids back off
 	Wait(SOLENOID_STATE_TIME_DELAY);
@@ -88,7 +97,7 @@ void Robot::OperatorControl(){
 		solenoid_state[i] = 0;
 	}
 
-	Macro->SaveStep(0, 0, 0, 0, solenoid_state[0], solenoid_state[1], solenoid_state[2], solenoid_state[3]);
+	//Macro->SaveStep(0, 0, 0, 0, solenoid_state[0], solenoid_state[1], solenoid_state[2], solenoid_state[3]);
 	
 	while(IsOperatorControl() && IsEnabled()){
 		// Cache joystick values
@@ -97,43 +106,44 @@ void Robot::OperatorControl(){
 		slider = Joysticks[0]->GetThrottle();
 		solenoid_buttons[0] = Joysticks[1]->GetRawButton(JOYSTICK_BUTTON_LIFT_SOLENOID);
 		solenoid_buttons[1] = Joysticks[1]->GetRawButton(JOYSTICK_BUTTON_CLAW_SOLENOID);
-		solenoid_buttons[1] = Joysticks[1]->GetRawButton(JOYSTICK_BUTTON_INTAKE_SOLENOID);
-		solenoid_buttons[2] = Joysticks[1]->GetRawButton(JOYSTICK_BUTTON_DOOR_SOLENOID);
+		solenoid_buttons[2] = Joysticks[1]->GetRawButton(JOYSTICK_BUTTON_INTAKE_SOLENOID);
+		solenoid_buttons[3] = Joysticks[1]->GetRawButton(JOYSTICK_BUTTON_DOOR_SOLENOID);
 
 		// Calculate motor speeds.
 		right_speed = (1 - ((slider + 1) / 2)) * (y + z); // This math takes the slider's input and converts it from -1 - 1 to 1 - 0, then uses that as a speed multiplier
 		left_speed = -(1 - ((slider + 1) / 2)) * (y - z);
 
 		// Drive
-		for(int i = 0;i < NUMBER_OF_TALONS - 2;i++){
-			if(i < (NUMBER_OF_TALONS - 2) / 2)             // Talons 0-1 are on the right side, and 2-3 on the left. Subtract 2 to account for the two claw talons
-				Talons[i]->Set(right_speed);
-			else
+		for(int i = 2;i < NUMBER_OF_TALONS;i++){
+			if(i < NUMBER_OF_TALONS - 2){
 				Talons[i]->Set(left_speed);
+			}else{
+				Talons[i]->Set(right_speed);
+			}
 		}
 
 		// Left intake motor
 		if(Joysticks[1]->GetRawButton(JOYSTICK_BUTTON_LEFT_INTAKE_MOTOR_IN)){
 			left_intake_state = 1;
-			Talons[PORT_LEFT_INTAKE_TALON]->Set(INTAKE_SPEED);
+			Talons[0]->Set(INTAKE_SPEED);
 		}else if(Joysticks[1]->GetRawButton(JOYSTICK_BUTTON_LEFT_INTAKE_MOTOR_OUT)){
 			left_intake_state = 2;
-			Talons[PORT_LEFT_INTAKE_TALON]->Set(-INTAKE_SPEED);
+			Talons[0]->Set(-INTAKE_SPEED);
 		}else{
 			left_intake_state = 0;
-			Talons[PORT_LEFT_INTAKE_TALON]->Set(0);
+			Talons[0]->Set(0);
 		}
 
 		// Right intake motor
 		if(Joysticks[1]->GetRawButton(JOYSTICK_BUTTON_RIGHT_INTAKE_MOTOR_IN)){
 			right_intake_state = 1;
-			Talons[PORT_RIGHT_INTAKE_TALON]->Set(INTAKE_SPEED);
+			Talons[1]->Set(INTAKE_SPEED);
 		}else if(Joysticks[1]->GetRawButton(JOYSTICK_BUTTON_RIGHT_INTAKE_MOTOR_OUT)){
 			right_intake_state = 2;
-			Talons[PORT_RIGHT_INTAKE_TALON]->Set(-INTAKE_SPEED);
+			Talons[1]->Set(-INTAKE_SPEED);
 		}else{
 			right_intake_state = 0;
-			Talons[PORT_RIGHT_INTAKE_TALON]->Set(0);
+			Talons[1]->Set(0);
 		}
 
 		//Solenoid control
@@ -163,14 +173,14 @@ void Robot::OperatorControl(){
 		}
 
 		// Record macro step
-		Macro->SaveStep(left_speed, right_speed, left_intake_state, right_intake_state, solenoid_state[0], solenoid_state[1], solenoid_state[2], solenoid_state[3]);
+		//Macro->SaveStep(left_speed, right_speed, left_intake_state, right_intake_state, solenoid_state[0], solenoid_state[1], solenoid_state[2], solenoid_state[3]);
 
 		//Wait before next cycle
 		Wait(CYCLE_TIME_DELAY);
 	}
 
 	// Stop recording macro
-	Macro->StopRecording();
+	//Macro->StopRecording();
 }
 
 START_ROBOT_CLASS(Robot);

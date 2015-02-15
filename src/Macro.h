@@ -16,19 +16,6 @@ public:
 
 	void Play(const int, Talon*[NUMBER_OF_TALONS], DoubleSolenoid*[NUMBER_OF_SOLENOIDS]);
 	
-	/* **********
-	-- Return Values for Non-Void Functions --
-	
-		* StartRecording:
-			-1 = another macro is currently being recorded (a new macro won't be recorded)
-			other int = file number that is now being recorded on
-		
-		* Play:
-			0 = macro completed successfully 
-			1 = a macro is currently being recorded (called macro won't play) 
-			2 = file cannot be found
-	********** */
-	
 private:
 	Timer* StepTimer;
 	FILE* File;
