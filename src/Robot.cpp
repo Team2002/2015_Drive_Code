@@ -3,12 +3,12 @@
 
 class Robot: public SampleRobot{
 public:
-	Joystick* Joysticks[NUMBER_OF_JOYSTICKS];       // 0 = Joystick
-	Talon* Talons[NUMBER_OF_TALONS];                // 0-2 = Right Talons, 3-5 = Left Talons
-	DoubleSolenoid* Solenoids[NUMBER_OF_SOLENOIDS]; // 0 = Lift, 1 = Claw, 2 = Door
-	Timer* Timers[NUMBER_OF_SOLENOIDS];             // 0 = Lift Timer, 1 = Claw Timer, 2 = Door Timer
-	Compressor* AirCompressor;
-	MacroRecorder* Macro;                           // Object to record and play back macros
+	Joystick* Joysticks[NUMBER_OF_JOYSTICKS];       // 0 = Drive Joystick, 1 = Lift Joystick
+	Talon* Talons[NUMBER_OF_TALONS];                // 0-1 = Intake Talons, 2-3 = Left Talons, 4-5 = Right Talons
+	DoubleSolenoid* Solenoids[NUMBER_OF_SOLENOIDS]; // 0 = Lift, 1 = Claw, 2 = Intake, 3 = Door
+	Timer* Timers[NUMBER_OF_SOLENOIDS];             // 0 = Lift Timer, 1 = Claw Timer, 2 = Intake Timer, 3 = Door TImer
+	Compressor* AirCompressor;                      // Air compressor
+	MacroRecorder* Macro;                           // Record and play back macros
 
 	Robot();
 	~Robot();
@@ -54,6 +54,7 @@ Robot::~Robot(){
 	for(int i = 0;i < NUMBER_OF_SOLENOIDS;i++)
 		delete Timers[i];
 
+	delete AirCompressor;
 	delete Macro;
 }
 
@@ -70,7 +71,7 @@ void Robot::Autonomous(){
 
 void Robot::OperatorControl(){
 	//Start recording macro
-	//Macro->StartRecording();
+	Macro->StartRecording(false);
 
 	// Variables
 	float y, z, slider;                         // Joystick floats
@@ -88,7 +89,8 @@ void Robot::OperatorControl(){
 		solenoid_button_already_pressed[i] = false; // These also need to be set before the tele-op loop begins, so I'll just do that here
 	}
 
-	//Macro->SaveStep(0, 0, 0, 0, solenoid_state[0], solenoid_state[1], solenoid_state[2], solenoid_state[3]);
+	// Record macro step
+	Macro->SaveStep(0, 0, 0, 0, solenoid_state[0], solenoid_state[1], solenoid_state[2], solenoid_state[3]);
 
 	// Set the solenoids back off
 	Wait(SOLENOID_STATE_TIME_DELAY);
@@ -97,7 +99,8 @@ void Robot::OperatorControl(){
 		solenoid_state[i] = 0;
 	}
 
-	//Macro->SaveStep(0, 0, 0, 0, solenoid_state[0], solenoid_state[1], solenoid_state[2], solenoid_state[3]);
+	// Record macro step
+	Macro->SaveStep(0, 0, 0, 0, solenoid_state[0], solenoid_state[1], solenoid_state[2], solenoid_state[3]);
 	
 	while(IsOperatorControl() && IsEnabled()){
 		// Cache joystick values
@@ -173,14 +176,14 @@ void Robot::OperatorControl(){
 		}
 
 		// Record macro step
-		//Macro->SaveStep(left_speed, right_speed, left_intake_state, right_intake_state, solenoid_state[0], solenoid_state[1], solenoid_state[2], solenoid_state[3]);
+		Macro->SaveStep(left_speed, right_speed, left_intake_state, right_intake_state, solenoid_state[0], solenoid_state[1], solenoid_state[2], solenoid_state[3]);
 
 		//Wait before next cycle
 		Wait(CYCLE_TIME_DELAY);
 	}
 
 	// Stop recording macro
-	//Macro->StopRecording();
+	Macro->StopRecording();
 }
 
 START_ROBOT_CLASS(Robot);

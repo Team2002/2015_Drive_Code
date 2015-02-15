@@ -10,7 +10,7 @@ public:
 	MacroRecorder();
 	~MacroRecorder();
 
-	void StartRecording(void);
+	void StartRecording(bool);
 	void SaveStep(float, float, int, int, int, int, int, int);
 	void StopRecording(void);
 
@@ -36,8 +36,8 @@ MacroRecorder::~MacroRecorder(){
 }
 
 
-void MacroRecorder::StartRecording(void){
-	if(is_recording) return;
+void MacroRecorder::StartRecording(bool start = true){
+	if(is_recording || !start) return;
 	is_recording = true;
 
 	int log_file = 0;

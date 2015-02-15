@@ -2,6 +2,8 @@
 
 
 /*
+	CURRENT
+
 	-- Joystick 1 --
 	Y-Axis: Forward / Reverse
 	Z-Axis: Turning
@@ -16,6 +18,15 @@
 	LT: Left Intake Out
 	RB: Right Intake In
 	RT: Right Intake Out
+
+
+	FUTURE
+
+	-- Joystick 1 (Kaito)--
+
+
+	-- Joystick 2 (Jorge)--
+
 */
 
 
@@ -23,7 +34,7 @@
 const int AUTONOMOUS_PROGRAM = 0;     // Macro file number to play in autonomous mode
 const float CYCLE_TIME_DELAY = 0.020, // Time to wait in seconds between each cycle. This gives the motors time to update
 SOLENOID_STATE_TIME_DELAY = 1,        // Time to wait in seconds between toggling a solenoid's state and turning the solenoid off
-INTAKE_SPEED = 0.3;                   // Speed to run the intake motors when taking in bins and totes
+INTAKE_SPEED = 0.5;                   // Speed to run the intake motors when taking in bins and totes
 
 // Joystick 2 Mapping
 const int JOYSTICK_BUTTON_LIFT_SOLENOID = 4,
