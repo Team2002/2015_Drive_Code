@@ -10,6 +10,9 @@ public:
 	Lift();
 	~Lift();
 	
+	void SetArmReverse();
+	void SetClawReverse();
+
 	void ToggleUpDown(bool);
 	void ToggleInOut(bool);
 	

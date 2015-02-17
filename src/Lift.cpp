@@ -12,9 +12,6 @@ Lift::Lift(){
 	claw_button_already_pressed = false;
 	arm_forward = false;
 	claw_forward = false;
-	
-	Arm->Set(DoubleSolenoid::kReverse);
-	Claw->Set(DoubleSolenoid::kReverse);
 }
 
 Lift::~Lift(){
@@ -22,6 +19,16 @@ Lift::~Lift(){
 	delete Claw;
 	delete ArmTimer;
 	delete ClawTimer;
+}
+
+
+void Lift::SetArmReverse(){
+	Arm->Set(DoubleSolenoid::kReverse);
+}
+
+
+void Lift::SetClawReverse(){
+	Claw->Set(DoubleSolenoid::kReverse);
 }
 
 

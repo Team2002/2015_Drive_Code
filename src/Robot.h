@@ -6,7 +6,6 @@
 #include "Constants.h"
 #include "Drive.h"
 #include "Lift.h"
-#include "Intake.h"
 #include "Macro.h"
 
 
@@ -21,10 +20,10 @@ public:
 	
 private:
 	Macro* o_Macro;
+	PowerDistributionPanel* o_PowerDist;
 	Joystick* o_Joysticks[NUMBER_OF_JOYSTICKS];
 	Compressor* o_Compressor;
 	Drive* o_Drive;
-	Intake* o_Intake;
 	Lift* o_Lift;
 };
 

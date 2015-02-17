@@ -20,8 +20,8 @@ Drive::~Drive(){
 
 
 void Drive::Set (float left_speed, float right_speed){
-	LeftMotor1->Set(left_speed);
-	LeftMotor2->Set(left_speed);
+	LeftMotor1->Set(-left_speed);
+	LeftMotor2->Set(-left_speed);
 	RightMotor1->Set(right_speed);
 	RightMotor2->Set(right_speed);
 }

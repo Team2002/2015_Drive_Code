@@ -1,7 +1,8 @@
 #include "Macro.h"
+#include "Constants.h"
+#include "WPILib.h"
 #include "Drive.h"
 #include "Lift.h"
-#include "Intake.h"
 #include <iostream>
 #include <string>
 #include <cstdio>
@@ -20,8 +21,8 @@ Macro::~Macro(){
 }
 
 
-void Macro::StartRecording(bool start){
-	if(is_recording || !start) return;
+void Macro::StartRecording(){
+	if(is_recording) return;
 		is_recording = true;
 
 	int log_file = 0;
@@ -44,12 +45,12 @@ void Macro::StartRecording(bool start){
 }
 
 
-void Macro::SaveStep(float left_speed, float right_speed, bool b_arm, bool b_claw, bool b_intake_clamp, int left_intake_state, int right_intake_state){
+void Macro::SaveStep(float left_speed, float right_speed, bool b_arm, bool b_claw){
 	if(!is_recording) return;
 
 	StepTimer->Stop();
 
-	fprintf(File, "%f,%f,%f,%d,%d,%d,%d,%d\n", StepTimer->Get(), left_speed, right_speed, b_arm, b_claw, b_intake_clamp, left_intake_state, right_intake_state);
+	fprintf(File, "%f,%f,%f,%d,%d\n", StepTimer->Get(), left_speed, right_speed, b_arm, b_claw);
 
 	StepTimer->Reset();
 	StepTimer->Start();
@@ -66,7 +67,7 @@ void Macro::StopRecording(void){
 }
 
 
-void Macro::Play(const int file_number, Drive* o_Drive, Lift* o_Lift, Intake* o_Intake, Compressor* o_Compressor){
+void Macro::Play(const int file_number, Drive* o_Drive, Lift* o_Lift, Compressor* o_Compressor){
 	if(is_recording) return;
 
 	File = fopen(("/home/lvuser/" + std::to_string(file_number) + ".csv").c_str(), "r");
@@ -75,23 +76,25 @@ void Macro::Play(const int file_number, Drive* o_Drive, Lift* o_Lift, Intake* o_
 	o_Compressor->Start();
 
 	float time, left_speed, right_speed;
-	int b_arm, b_claw, b_intake_clamp, left_intake_state, right_intake_state;
+	int b_arm, b_claw;
+
+	o_Lift->SetArmReverse();
+	o_Lift->SetClawReverse();
+
+	Wait(SOLENOID_STATE_TIME_DELAY);
 
 	while(true){
-		if(fscanf(File, "%f,%f,%f,%d,%d,%d,%d,%d\n", &time, &left_speed, &right_speed, &b_arm, &b_claw, &b_intake_clamp, &left_intake_state, &right_intake_state) < 8)
+		if(fscanf(File, "%f,%f,%f,%d,%d\n", &time, &left_speed, &right_speed, &b_arm, &b_claw) < 5)
 			break;
 
-		Wait(time);
+		Wait(time * MACRO_TIME_MULTIPLIER);
 
 		o_Drive->Set(left_speed, right_speed);
 		o_Lift->ToggleUpDown(b_arm);
 		o_Lift->ToggleInOut(b_claw);
-		o_Intake->Toggle(b_intake_clamp);
-		o_Intake->Set(left_intake_state, right_intake_state);
 	}
 
 	o_Drive->Set(0, 0);
-	o_Intake->Set(0, 0);
 
 	fclose(File);
 
