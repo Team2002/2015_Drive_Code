@@ -7,14 +7,16 @@
 
 class Lift{
 public:
-	Lift();
-	~Lift();
+	Lift(void);
+	~Lift(void);
 	
-	void SetArmReverse();
-	void SetClawReverse();
-
-	void ToggleUpDown(bool);
-	void ToggleInOut(bool);
+	void SetArm(int);
+	void ToggleArm(bool);
+	void CheckArm(void);
+	
+	void SetClaw(int);
+	void ToggleClaw(bool);
+	void CheckClaw(void);
 	
 private:
 	DoubleSolenoid* Arm;

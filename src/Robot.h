@@ -11,8 +11,8 @@
 
 class Robot: public SampleRobot{
 public:
-	Robot();
-	~Robot();
+	Robot(void);
+	~Robot(void);
 
 	void RobotInit(void);
 	void Autonomous(void);

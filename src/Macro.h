@@ -9,18 +9,19 @@
 
 class Macro{
 public:
-	Macro();
-	~Macro();
+	Macro(void);
+	~Macro(void);
 	
-	void StartRecording(void);
+	void StartRecording(bool);
 	void SaveStep(float, float, bool, bool);
 	void StopRecording(void);
 	
-	void Play(const int, Drive*, Lift*, Compressor*);
+	void Play(const int, Drive*, Lift*);
 	
 private:
 	Timer* StepTimer;
 	FILE* File;
+	
 	bool is_recording;
 };
 

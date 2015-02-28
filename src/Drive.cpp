@@ -3,7 +3,7 @@
 #include "Constants.h"
 
 
-Drive::Drive(){
+Drive::Drive(void){
 	LeftMotor1 = new Talon(PORT_LEFT_TALON_1);
 	LeftMotor2 = new Talon(PORT_LEFT_TALON_2);
 	RightMotor1 = new Talon(PORT_RIGHT_TALON_1);
@@ -11,7 +11,7 @@ Drive::Drive(){
 }
 
 
-Drive::~Drive(){
+Drive::~Drive(void){
 	delete LeftMotor1;
 	delete LeftMotor2;
 	delete RightMotor1;

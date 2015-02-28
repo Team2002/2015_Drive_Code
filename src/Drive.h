@@ -7,8 +7,8 @@
 
 class Drive{
 public:
-	Drive();
-	~Drive();
+	Drive(void);
+	~Drive(void);
 	
 	void Set(float, float);
 	

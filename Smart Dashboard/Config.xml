@@ -1,0 +1,83 @@
+<xml version="1.0">
+<dashboard>
+	<widget field=" CLAW" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
+		<location x="618" y="550"/>
+		<width>107</width>
+		<height>25</height>
+	</widget>
+	<widget field=" ARM" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
+		<location x="475" y="550"/>
+		<width>100</width>
+		<height>25</height>
+	</widget>
+	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.Image">
+		<location x="425" y="375"/>
+		<width>350</width>
+		<height>150</height>
+		<property name="Image File" value="C:\Users\Admin\Desktop\Smart Dashboard\Wolf.png"/>
+		<property name="Maintain Aspect Ratio" value="true"/>
+	</static-widget>
+	<widget field="CURRENT (CHANNEL 3)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.ProgressBar">
+		<location x="1029" y="447"/>
+		<height>53</height>
+		<property name="Maximum" value="20.0"/>
+	</widget>
+	<widget field="CURRENT (CHANNEL 2)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.ProgressBar">
+		<location x="1029" y="372"/>
+		<height>53</height>
+		<property name="Maximum" value="20.0"/>
+	</widget>
+	<widget field="CURRENT (CHANNEL 1)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.ProgressBar">
+		<location x="29" y="450"/>
+		<height>50</height>
+		<property name="Maximum" value="20.0"/>
+	</widget>
+	<widget field="CURRENT (CHANNEL 0)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.ProgressBar">
+		<location x="29" y="375"/>
+		<height>50</height>
+		<property name="Maximum" value="20.0"/>
+	</widget>
+	<widget field="RIGHT DRIVE SPEED" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.SimpleDial">
+		<location x="775" y="375"/>
+		<property name="Upper Limit" value="1.0"/>
+		<property name="Lower Limit" value="-1.0"/>
+		<property name="Tick Interval" value="0.1"/>
+	</widget>
+	<widget field="LEFT DRIVE SPEED" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.SimpleDial">
+		<location x="175" y="375"/>
+		<property name="Upper Limit" value="1.0"/>
+		<property name="Lower Limit" value="-1.0"/>
+		<property name="Tick Interval" value="0.1"/>
+	</widget>
+	<widget field="TEMPERATURE" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.LinePlot">
+		<location x="175" y="25"/>
+		<property name="Buffer Size (samples)" value="100"/>
+	</widget>
+	<widget field="VOLTAGE" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.LinePlot">
+		<location x="625" y="25"/>
+		<property name="Buffer Size (samples)" value="100"/>
+	</widget>
+	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.ConnectionIndicator">
+		<location x="25" y="25"/>
+		<width>100</width>
+		<height>300</height>
+		<property name="No Connection Color" value="177.4.4.255"/>
+		<property name="Graphics" value="Simple"/>
+	</static-widget>
+	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.ConnectionIndicator">
+		<location x="25" y="25"/>
+		<width>100</width>
+		<height>300</height>
+		<property name="Graphics" value="Simple"/>
+	</static-widget>
+	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.ConnectionIndicator">
+		<location x="1075" y="25"/>
+		<width>100</width>
+		<height>300</height>
+		<property name="No Connection Color" value="175.5.5.255"/>
+		<property name="Graphics" value="Simple"/>
+	</static-widget>
+</dashboard>
+<live-window>
+</live-window>
+</xml>
