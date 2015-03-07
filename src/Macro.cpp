@@ -80,7 +80,7 @@ void Macro::Play(const int file_number, Drive* o_Drive, Lift* o_Lift){
 	o_Lift->SetArm(2);
 	o_Lift->SetClaw(2);
 
-	while(fscanf(File, "%f,%f,%f,%d,%d\n", &time, &left_speed, &right_speed, &b_arm, &b_claw) < 1){
+	while(fscanf(File, "%f,%f,%f,%d,%d\n", &time, &left_speed, &right_speed, &b_arm, &b_claw) < 5){
 		Wait(time);
 
 		o_Drive->Set(left_speed, right_speed);

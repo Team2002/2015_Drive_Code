@@ -20,22 +20,22 @@
 	<widget field="CURRENT (CHANNEL 3)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.ProgressBar">
 		<location x="1029" y="447"/>
 		<height>53</height>
-		<property name="Maximum" value="20.0"/>
+		<property name="Maximum" value="30.0"/>
 	</widget>
 	<widget field="CURRENT (CHANNEL 2)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.ProgressBar">
 		<location x="1029" y="372"/>
 		<height>53</height>
-		<property name="Maximum" value="20.0"/>
+		<property name="Maximum" value="30.0"/>
 	</widget>
 	<widget field="CURRENT (CHANNEL 1)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.ProgressBar">
 		<location x="29" y="450"/>
 		<height>50</height>
-		<property name="Maximum" value="20.0"/>
+		<property name="Maximum" value="30.0"/>
 	</widget>
 	<widget field="CURRENT (CHANNEL 0)" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.ProgressBar">
 		<location x="29" y="375"/>
 		<height>50</height>
-		<property name="Maximum" value="20.0"/>
+		<property name="Maximum" value="30.0"/>
 	</widget>
 	<widget field="RIGHT DRIVE SPEED" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.SimpleDial">
 		<location x="775" y="375"/>
@@ -62,12 +62,6 @@
 		<width>100</width>
 		<height>300</height>
 		<property name="No Connection Color" value="177.4.4.255"/>
-		<property name="Graphics" value="Simple"/>
-	</static-widget>
-	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.ConnectionIndicator">
-		<location x="25" y="25"/>
-		<width>100</width>
-		<height>300</height>
 		<property name="Graphics" value="Simple"/>
 	</static-widget>
 	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.ConnectionIndicator">

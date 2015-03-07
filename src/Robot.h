@@ -14,12 +14,12 @@ public:
 	Robot(void);
 	~Robot(void);
 
-	void RobotInit(void);
+	void RobotInit(void);        // Each of these functions is called once when the robot enters that state
 	void Autonomous(void);
 	void OperatorControl(void);
 	
 private:
-	Macro* o_Macro;
+	Macro* o_Macro;                             // o_ has been appended to the beginning of each object to avoid naming conflicts (o for object)
 	PowerDistributionPanel* o_PowerDist;
 	Joystick* o_Joysticks[NUMBER_OF_JOYSTICKS];
 	Compressor* o_Compressor;

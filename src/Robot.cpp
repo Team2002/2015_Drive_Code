@@ -59,7 +59,7 @@ void Robot::OperatorControl(void){
 	bool b_arm, b_claw;
 
 	// Start recording macro (if arg 'true' is sent)
-	o_Macro->StartRecording(false);
+	o_Macro->StartRecording(true);
 
 	// Set solenoids to reverse as default state
 	o_Lift->SetArm(2);
@@ -67,7 +67,7 @@ void Robot::OperatorControl(void){
 
 	while(IsOperatorControl() && IsEnabled()){ // Loop while in teleop mode
 		// Cache joystick 1 variables
-		y = -o_Joysticks[0]->GetRawAxis(AXIS_Y); // Set to negative to counteract the joystick's problem of having a reversed y axis
+		y = o_Joysticks[0]->GetRawAxis(AXIS_Y);
 		z = o_Joysticks[0]->GetRawAxis(AXIS_Z);
 		
 		// Cache joystick 2 variables
@@ -75,8 +75,8 @@ void Robot::OperatorControl(void){
 		b_claw = o_Joysticks[1]->GetRawButton(BUTTON_CLAW);
 
 		// Calculate motor speeds
-		left_speed = (pow(fabs(y), CURVE - 1) * y) + (pow(fabs(z), CURVE - 1) * z);
-		right_speed = (pow(fabs(y), CURVE - 1)  * y) - (pow(fabs(z), CURVE - 1) * z);
+		left_speed = (pow(fabs(y), CURVE - 1) * y) - (pow(fabs(z), CURVE - 1) * z);
+		right_speed = (pow(fabs(y), CURVE - 1)  * y) + (pow(fabs(z), CURVE - 1) * z);
 		if(left_speed > 1) left_speed = 1;
 		if(left_speed <-1) left_speed = -1;
 		if(right_speed > 1) right_speed = 1;

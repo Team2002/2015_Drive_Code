@@ -20,7 +20,7 @@ Drive::~Drive(void){
 
 
 void Drive::Set (float left_speed, float right_speed){
-	LeftMotor1->Set(-left_speed);
+	LeftMotor1->Set(-left_speed); // The left motors are reversed so that passing two positive values to this function will result in the robot moving forward
 	LeftMotor2->Set(-left_speed);
 	RightMotor1->Set(right_speed);
 	RightMotor2->Set(right_speed);
