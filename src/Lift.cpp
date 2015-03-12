@@ -1,6 +1,6 @@
 #include "Lift.h"
 #include "WPILib.h"
-#include "Constants.h"
+#include "Config.h"
 
 
 Lift::Lift(void){
@@ -25,12 +25,12 @@ Lift::~Lift(void){
 
 
 void Lift::SetArm(int state){
-	if(state == 1){
-		Arm->Set(DoubleSolenoid::kForward);
-		SmartDashboard::PutBoolean(" ARM", true);
-	}else if(state == 2){
+	if(state == 0){
 		Arm->Set(DoubleSolenoid::kReverse);
 		SmartDashboard::PutBoolean(" ARM", false);
+	}else if(state == 1){
+		Arm->Set(DoubleSolenoid::kForward);
+		SmartDashboard::PutBoolean(" ARM", true);
 	}
 	
 	ArmTimer->Reset();
@@ -68,12 +68,12 @@ void Lift::CheckArm(void){
 
 
 void Lift::SetClaw(int state){
-	if(state == 1){
-		Claw->Set(DoubleSolenoid::kForward);
-		SmartDashboard::PutBoolean(" CLAW", true);
-	}else if(state == 2){
+	if(state == 0){
 		Claw->Set(DoubleSolenoid::kReverse);
 		SmartDashboard::PutBoolean(" CLAW", false);
+	}else if(state == 1){
+		Claw->Set(DoubleSolenoid::kForward);
+		SmartDashboard::PutBoolean(" CLAW", true);
 	}
 	
 	ClawTimer->Reset();

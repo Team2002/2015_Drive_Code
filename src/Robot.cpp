@@ -1,6 +1,6 @@
 #include "WPILib.h"
 #include "Robot.h"
-#include "Constants.h"
+#include "Config.h"
 #include "Macro.h"
 #include <iostream>
 #include <string>
@@ -59,11 +59,11 @@ void Robot::OperatorControl(void){
 	bool b_arm, b_claw;
 
 	// Start recording macro (if arg 'true' is sent)
-	o_Macro->StartRecording(true);
+	o_Macro->StartRecording(false);
 
 	// Set solenoids to reverse as default state
-	o_Lift->SetArm(2);
-	o_Lift->SetClaw(2);
+	o_Lift->SetArm(ARM_DEFAULT_STATE);
+	o_Lift->SetClaw(CLAW_DEFAULT_STATE);
 
 	while(IsOperatorControl() && IsEnabled()){ // Loop while in teleop mode
 		// Cache joystick 1 variables
@@ -75,8 +75,8 @@ void Robot::OperatorControl(void){
 		b_claw = o_Joysticks[1]->GetRawButton(BUTTON_CLAW);
 
 		// Calculate motor speeds
-		left_speed = (pow(fabs(y), CURVE - 1) * y) - (pow(fabs(z), CURVE - 1) * z);
-		right_speed = (pow(fabs(y), CURVE - 1)  * y) + (pow(fabs(z), CURVE - 1) * z);
+		left_speed = (pow(fabs(y), CURVE - 1) * y) + (pow(fabs(z), CURVE - 1) * z);
+		right_speed = (pow(fabs(y), CURVE - 1)  * y) - (pow(fabs(z), CURVE - 1) * z);
 		if(left_speed > 1) left_speed = 1;
 		if(left_speed <-1) left_speed = -1;
 		if(right_speed > 1) right_speed = 1;

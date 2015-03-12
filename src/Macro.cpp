@@ -1,5 +1,5 @@
 #include "Macro.h"
-#include "Constants.h"
+#include "Config.h"
 #include "WPILib.h"
 #include "Drive.h"
 #include "Lift.h"
@@ -51,7 +51,7 @@ void Macro::SaveStep(float left_speed, float right_speed, bool b_arm, bool b_cla
 
 	StepTimer->Stop();
 
-	fprintf(File, "%f,%f,%f,%d,%d\n", StepTimer->Get(), &left_speed, &right_speed, &b_arm, &b_claw);
+	fprintf(File, "%f,%f,%f,%d,%d\n", StepTimer->Get(), left_speed, right_speed, b_arm, b_claw);
 
 	StepTimer->Reset();
 	StepTimer->Start();
@@ -77,10 +77,10 @@ void Macro::Play(const int file_number, Drive* o_Drive, Lift* o_Lift){
 	float time, left_speed, right_speed;
 	bool b_arm, b_claw;
 
-	o_Lift->SetArm(2);
-	o_Lift->SetClaw(2);
+	o_Lift->SetArm(ARM_DEFAULT_STATE);
+	o_Lift->SetClaw(CLAW_DEFAULT_STATE);
 
-	while(fscanf(File, "%f,%f,%f,%d,%d\n", &time, &left_speed, &right_speed, &b_arm, &b_claw) < 5){
+	while(fscanf(File, "%f,%f,%f,%d,%d\n", &time, &left_speed, &right_speed, &b_arm, &b_claw) == 5){
 		Wait(time);
 
 		o_Drive->Set(left_speed, right_speed);

@@ -10,13 +10,17 @@ public:
 	Drive(void);
 	~Drive(void);
 	
-	void Set(float, float);
+	int Set(float, float);
 	
 private:
 	Talon* LeftMotor1;
 	Talon* LeftMotor2;
 	Talon* RightMotor1;
 	Talon* RightMotor2;
+	Encoder* LeftEncoder;
+	Encoder* RightEncoder;
+
+	int distance_since_last;
 };
 
 
