@@ -1,14 +1,14 @@
-#ifndef MACRO_H__INCLUDED
-#define MACRO_H__INCLUDED
+#ifndef MACRO_H__INCLUDED // check if MACRO_H__INCLUDED has been defined
+#define MACRO_H__INCLUDED // define MACRO_H__INCLUDED
 
 
-#include "WPILib.h"
-#include "Drive.h"
-#include "Lift.h"
+#include "WPILib.h" // include WPILib.h library
+#include "Drive.h" // include Drive.h library
+#include "Lift.h" // include Lift.h library
 
 
-class Macro{
-public:
+class Macro{ // define Macro class
+public: // info from class available to all programs
 	Macro(void);
 	~Macro(void);
 	
@@ -18,7 +18,7 @@ public:
 	
 	void Play(const int, Drive*, Lift*);
 	
-private:
+private: // info from class only available to this program
 	Timer* StepTimer;
 	FILE* File;
 	
