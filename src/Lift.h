@@ -1,12 +1,12 @@
-#ifndef LIFT_H__INCLUDED
-#define LIFT_H__INCLUDED
+#ifndef LIFT_H__INCLUDED //Check to see if the variable LIFT_H_INCLUDED has been defined yet
+#define LIFT_H__INCLUDED //If variable has not yet been defined, define it
 
 
-#include "WPILib.h"
+#include "WPILib.h" //Include the WPLib.h library in the program
 
 
-class Lift{
-public:
+class Lift{ 
+public: //Declare variables available for use in outside programs
 	Lift(void);
 	~Lift(void);
 	
@@ -18,7 +18,7 @@ public:
 	void ToggleClaw(bool);
 	void CheckClaw(void);
 	
-private:
+private: //Declare variables that are not able to be accessed from outside programs
 	DoubleSolenoid* Arm;
 	DoubleSolenoid* Claw;
 	Timer* ArmTimer;
