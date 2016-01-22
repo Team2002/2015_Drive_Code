@@ -1,10 +1,10 @@
-#include "Drive.h"
-#include "WPILib.h"
-#include "Config.h"
+#include "Drive.h" // includes the Drive.h library
+#include "WPILib.h" // includes the WPILib.h library
+#include "Config.h" // includes the Config.h library
 
 
-Drive::Drive(void){
-	LeftMotor1 = new Talon(PORT_LEFT_TALON_1);
+Drive::Drive(void){ // Drive class
+	LeftMotor1 = new Talon(PORT_LEFT_TALON_1); // replace all of these variables with 'new' constants
 	LeftMotor2 = new Talon(PORT_LEFT_TALON_2);
 	RightMotor1 = new Talon(PORT_RIGHT_TALON_1);
 	RightMotor2 = new Talon(PORT_RIGHT_TALON_2);
@@ -15,8 +15,8 @@ Drive::Drive(void){
 }
 
 
-Drive::~Drive(void){
-	delete LeftMotor1;
+Drive::~Drive(void){ // destroy Drive
+	delete LeftMotor1; // delete all old variables
 	delete LeftMotor2;
 	delete RightMotor1;
 	delete RightMotor2;
@@ -25,7 +25,7 @@ Drive::~Drive(void){
 }
 
 
-int Drive::Set(float left_speed, float right_speed){
+int Drive::Set(float left_speed, float right_speed){ // Set function
 	distance_since_last = 0;
 
 	LeftMotor1->Set(left_speed); // The right motors are reversed so that passing two positive values to this function will result in the robot moving forward
