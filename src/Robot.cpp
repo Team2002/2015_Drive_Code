@@ -1,3 +1,4 @@
+// Include header files and input/output capabilities
 #include "WPILib.h"
 #include "Robot.h"
 #include "Config.h"
@@ -5,8 +6,9 @@
 #include <iostream>
 #include <string>
 
-
+// Create pointers
 Robot::Robot(void){
+	// Objects only accessible because the function is a member of the class Robot
 	o_Macro = new Macro();
 	o_PowerDist = new PowerDistributionPanel();
 	o_Joysticks[0] = new Joystick(PORT_JOYSTICK_1);
@@ -16,7 +18,7 @@ Robot::Robot(void){
 	o_Lift = new Lift();
 }
 
-
+// Destroy pointers
 Robot::~Robot(void){
 	for(int i = 0;i < NUMBER_OF_JOYSTICKS;i++)
 		delete o_Joysticks[i];
