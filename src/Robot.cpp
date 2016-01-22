@@ -30,7 +30,7 @@ Robot::~Robot(void){
 	delete o_Lift;
 }
 
-
+// Call RobitInit function located in Robot class
 void Robot::RobotInit(void){
 	// Start the air compressor
 	o_Compressor->Start();
@@ -48,13 +48,13 @@ void Robot::RobotInit(void){
 	SmartDashboard::PutBoolean(" CLAW", false);
 }
 
-
+// Call Autonomous function located in Robot class
 void Robot::Autonomous(void){
 	// Play macro file
 	o_Macro->Play(0, o_Drive, o_Lift);
 }
 
-
+// Call OperatorControl function located in Robot class
 void Robot::OperatorControl(void){
 	// Variables for caching joystick values and calculating motor speeds
 	float y, z, left_speed, right_speed;
